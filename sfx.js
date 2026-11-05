@@ -208,36 +208,6 @@
     hiss({ at, dur: 0.02, gain: blue ? 0.03 : 0.04, freq: blue ? 3200 : 700, q: 1 });
   }
 
-  function reveal(first) {
-    if (!ready()) return;
-    const blue = isBlue();
-    const p1 = first === 0;
-    const at = ctx.currentTime + 0.004;
-    const root = blue ? (p1 ? 523.25 : 659.25) : (p1 ? 392 : 329.63);
-    const up = blue ? (p1 ? 783.99 : 987.77) : (p1 ? 587.33 : 493.88);
-    tone({
-      type: blue ? 'sine' : 'triangle',
-      freq: root,
-      at,
-      attack: 0.005,
-      decay: 0.28,
-      gain: 0.055,
-      cutoff: blue ? 7000 : 2600
-    });
-    tone({
-      type: blue ? 'sine' : 'triangle',
-      freq: up,
-      at: at + 0.085,
-      attack: 0.005,
-      decay: 0.34,
-      gain: 0.05,
-      cutoff: blue ? 7000 : 2600
-    });
-    if (blue) {
-      tone({ type: 'sine', freq: up * 2, at: at + 0.09, attack: 0.004, decay: 0.18, gain: 0.018 });
-    }
-  }
-
   function handoff(side) {
     if (!ready()) return;
     const blue = isBlue();
@@ -345,7 +315,6 @@
     setMuted,
     claim,
     denied,
-    reveal,
     handoff,
     confirm,
     outcome

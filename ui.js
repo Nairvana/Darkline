@@ -105,7 +105,8 @@
     endNewBtn: byId('endNewBtn'),
     toast: byId('toast'),
     bgmDark: byId('bgmDark'),
-    bgmBlue: byId('bgmBlue')
+    bgmBlue: byId('bgmBlue'),
+    sfxFlip: byId('sfxFlip')
   };
 
   // Opt-in only: ?debug=1 (fair read-only), ?debug=full (full read-only),
@@ -159,6 +160,7 @@
   const BGM_VOLUME = 0.28;
   const BGM_FADE_IN = 900;
   const BGM_FADE_OUT = 480;
+  const FLIP_VOLUME = 0.55;
   const bgmTracks = el.bgmDark && el.bgmBlue
     ? [
         { audio: el.bgmDark, raf: 0 },
@@ -242,6 +244,7 @@
     const result = D.resolveInitiative(state, pick);
     if (!result) return false;
     drawSettled = true;
+    playFlipSfx();
     const pickerLabel = localMode ? 'P1' : '你';
     const otherLabel = localMode ? 'P2' : '对手';
 
@@ -263,7 +266,6 @@
       el.drawResult.innerHTML =
         `${pickerLabel}${gap}抽到 <b>${result.mine}</b>，${otherLabel}${gap}抽到 <b>${result.foe}</b>。` +
         (result.first === 0 ? `${pickerLabel}${gap}先手。` : `${otherLabel}${gap}先手。`);
-      Sfx.reveal(result.first);
       el.drawDialog.focus({ preventScroll: true });
       drawTimer = setTimeout(() => {
         drawTimer = null;
@@ -1425,6 +1427,19 @@
       toast(label);
     };
     transition.finished.then(done, done);
+  }
+
+  function playFlipSfx() {
+    const audio = el.sfxFlip;
+    if (!audio || bgmMuted) return;
+    try {
+      audio.currentTime = 0;
+      audio.volume = FLIP_VOLUME;
+      const playback = audio.play();
+      if (playback && playback.catch) playback.catch(() => {});
+    } catch (error) {
+      // Playback can fail before the first user gesture; the draw is silent then.
+    }
   }
 
   function initBgm() {
